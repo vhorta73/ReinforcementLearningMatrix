@@ -2,6 +2,8 @@ package agent.interfaces;
 
 import java.util.List;
 
+import agent.constants.Action;
+
 /**
  * The State defined by the environment, accepted by the Agent.
  * 

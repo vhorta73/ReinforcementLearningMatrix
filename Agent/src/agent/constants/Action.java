@@ -1,4 +1,4 @@
-package agent.interfaces;
+package agent.constants;
 /**
  * All possible actions.
  * 

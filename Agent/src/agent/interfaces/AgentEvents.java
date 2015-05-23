@@ -2,6 +2,8 @@ package agent.interfaces;
 
 import java.util.List;
 
+import agent.constants.Action;
+
 /**
  * AgentEvents stores events for all state-action-state rewards.
  * Reward values are stored as given into an in-built moving average

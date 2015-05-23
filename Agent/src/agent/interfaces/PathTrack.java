@@ -2,7 +2,7 @@ package agent.interfaces;
 
 
 /**
- * PathTrach interface
+ * PathTrack interface
  * 
  * @author Vasco
  *

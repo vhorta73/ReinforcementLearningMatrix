@@ -10,11 +10,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import agent.constants.Action;
 import agent.impl.AgentImpl;
 import agent.impl.StateAttributesImpl;
 import agent.impl.StateImpl;
 import agent.impl.VisionImpl;
-import agent.interfaces.Action;
 import agent.interfaces.Agent;
 import agent.interfaces.State;
 import agent.interfaces.StateAttributes;

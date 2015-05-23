@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import environment.impl.ActionMatrixProcess;
 import environment.impl.PositionImpl;
 import environment.interfaces.Position;

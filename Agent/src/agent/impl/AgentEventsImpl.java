@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import agent.interfaces.ActionValue;
 import agent.interfaces.AgentEvents;
 import agent.interfaces.AgentStateValue;

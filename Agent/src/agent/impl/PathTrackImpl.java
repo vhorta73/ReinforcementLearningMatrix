@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import agent.interfaces.ActionValue;
 import agent.interfaces.PathTrack;
 import agent.interfaces.State;

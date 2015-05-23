@@ -2,7 +2,7 @@ package agent.impl;
 
 import java.util.List;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import agent.interfaces.AgentStateValue;
 import agent.interfaces.StateAttributes;
 

@@ -10,12 +10,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import agent.constants.Action;
 import agent.impl.ActionValueImpl;
 import agent.impl.PathTrackImpl;
 import agent.impl.StateAttributesImpl;
 import agent.impl.StateImpl;
 import agent.impl.VisionImpl;
-import agent.interfaces.Action;
 import agent.interfaces.ActionValue;
 import agent.interfaces.PathTrack;
 import agent.interfaces.State;

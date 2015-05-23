@@ -1,6 +1,6 @@
 package agent.impl;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import agent.interfaces.ActionValue;
 /**
  * The ActionValue implementation.

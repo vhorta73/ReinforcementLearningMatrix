@@ -1,4 +1,7 @@
 package agent.interfaces;
+
+import agent.constants.Action;
+
 /**
  * The Agent interface to be used by the Environment.
  * Agent prepares an Action to be picked up by the Environment 

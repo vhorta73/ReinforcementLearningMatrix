@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import agent.constants.Action;
 import agent.impl.ActionValueImpl;
-import agent.interfaces.Action;
 import agent.interfaces.ActionValue;
 
 /**

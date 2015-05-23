@@ -1,6 +1,6 @@
 package environment.impl;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 import environment.interfaces.ActionProcess;
 import environment.interfaces.Position;
 

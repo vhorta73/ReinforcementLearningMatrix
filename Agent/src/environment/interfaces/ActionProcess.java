@@ -1,6 +1,6 @@
 package environment.interfaces;
 
-import agent.interfaces.Action;
+import agent.constants.Action;
 
 /**
  * The ActionProcess interface.

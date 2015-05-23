@@ -1,4 +1,7 @@
 package agent.interfaces;
+
+import agent.constants.Action;
+
 /**
  * The Action Value interface.
  * 

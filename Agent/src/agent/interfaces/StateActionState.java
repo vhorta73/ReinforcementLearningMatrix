@@ -1,5 +1,7 @@
 package agent.interfaces;
 
+import agent.constants.Action;
+
 
 /**
  * StateActionState interface.
