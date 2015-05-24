@@ -12,14 +12,14 @@ public interface Pixel {
 	 * @return Integer
 	 */
 	public Integer getR();
-	
+
 	/**
 	 * The Green value.
 	 * 
 	 * @return Integer
 	 */
 	public Integer getG();
-	
+
 	/**
 	 * The Blue value.
 	 * 
@@ -39,5 +39,5 @@ public interface Pixel {
 	 * 
 	 * @return Double
 	 */
-	public Double reward();
+	public Double getReward();
 }

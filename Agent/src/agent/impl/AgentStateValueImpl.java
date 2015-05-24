@@ -19,26 +19,26 @@ import agent.interfaces.StateAttributes;
  *
  */
 public class AgentStateValueImpl extends StateImpl implements AgentStateValue {
-	/**
-	 * Constructor.
-	 * 
-	 * @param actionList available actions on this state.
-	 * @param stateAttributes State Attributes.
-	 */
-	public AgentStateValueImpl(List<Action> actionList, StateAttributes stateAttributes) {
-		super(actionList, stateAttributes);
-	}
+    /**
+     * Constructor.
+     * 
+     * @param actionList available actions on this state.
+     * @param stateAttributes State Attributes.
+     */
+    public AgentStateValueImpl(List<Action> actionList, StateAttributes stateAttributes) {
+        super(actionList, stateAttributes);
+    }
 
-//	/**
-//	 * The state value
-//	 */
-//	@Override
-//	public Integer getStateId() {
-//		// TODO: A clever way to generate a state...
-//		StateAttributes stateAttributes = super.getStateAttributes();
-//		List<Action> actions = super.getActions();
-//		Integer actionsCode = actions.hashCode();
-//		Integer stateAttributesCode = stateAttributes.getValue();
-//		return actionsCode + stateAttributesCode;
-//	}
+    /**
+     * The state value
+     */
+    @Override
+    public Integer getStateId() {
+        // TODO: A clever way to generate a state...
+        StateAttributes stateAttributes = super.getStateAttributes();
+        List<Action> actions = super.getActions();
+        Integer actionsCode = actions.hashCode();
+        Integer stateAttributesCode = stateAttributes.getValue();
+        return actionsCode + stateAttributesCode;
+    }
 }

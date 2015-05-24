@@ -24,7 +24,7 @@ public class AgentEventsImpl implements AgentEvents {
      * All the agent events known so far.
      */
     private Map<Integer,Map<Action,Map<Integer, SASValue>>> agentEvents;
-    
+
     /**
      * The sample amount values will be averaged for.
      * Default will be 100.
@@ -38,7 +38,7 @@ public class AgentEventsImpl implements AgentEvents {
      */
     public AgentEventsImpl(int averagingSamples) {
         if ( averagingSamples <= 0 ) throw new IllegalArgumentException("Cannot set " + averagingSamples + " as an averaging sample.");
-        agentEvents = new HashMap<Integer,Map<Action,Map<Integer, SASValue>>>();
+        this.agentEvents = new HashMap<Integer,Map<Action,Map<Integer, SASValue>>>();
         this.averagingSamples = averagingSamples;
     }
 
@@ -49,12 +49,12 @@ public class AgentEventsImpl implements AgentEvents {
      */
     @Override
     public void addEvent(State previousState, Action action, State currentState, Double reward) {
-		// Check input.
-		if ( previousState == null ) throw new IllegalArgumentException("Null previous State supplied.");
-		if ( action == null ) throw new IllegalArgumentException("Null action supplied.");
-		if ( currentState == null ) throw new IllegalArgumentException("Null current State supplied.");
-		if ( previousState.getActions().size() == 0 ) throw new IllegalStateException("No actions available from previouState.");
-		if ( !previousState.getActions().contains(action) ) throw new IllegalStateException("Action " + action + " is not listed in previousState.");
+        // Check input.
+        if ( previousState == null ) throw new IllegalArgumentException("Null previous State supplied.");
+        if ( action == null ) throw new IllegalArgumentException("Null action supplied.");
+        if ( currentState == null ) throw new IllegalArgumentException("Null current State supplied.");
+        if ( previousState.getActions().size() == 0 ) throw new IllegalStateException("No actions available from previouState.");
+        if ( !previousState.getActions().contains(action) ) throw new IllegalStateException("Action " + action + " is not listed in previousState.");
 
         // Initialisations.
         Map<Action,Map<Integer, SASValue>> actionStateValue = new HashMap<Action, Map<Integer, SASValue>>();
@@ -69,7 +69,7 @@ public class AgentEventsImpl implements AgentEvents {
         // Some records found
         if ( agentEvents.size() != 0 ) {
 
-        	// We have visited the previous State before
+            // We have visited the previous State before
             if ( agentEvents.get(previousStateValue) != null ) {
                 actionStateValue = agentEvents.get(previousStateValue);
 
@@ -97,23 +97,30 @@ public class AgentEventsImpl implements AgentEvents {
      */
     @Override
     public Action getBestAction(State state) {
-    	// Check input
-    	if ( state == null ) throw new IllegalArgumentException("Null state received.");
-    	if ( state.getActions().size() == 0 ) throw new IllegalStateException("No actiona available for state.");
+        // Check input
+        if ( state == null ) throw new IllegalArgumentException("Null state received.");
+        if ( state.getActions().size() == 0 ) throw new IllegalStateException("No actions available for state.");
 
-    	// To calculate the state value from the attributes. This defaults to the state getStateValue()
-    	List<Action> actionList = state.getActions();
-    	StateAttributes stateAttributes = state.getStateAttributes();
-    	AgentStateValue agentStateValue = new AgentStateValueImpl(actionList, stateAttributes);
-    	Integer thisStateValue = agentStateValue.getStateId();
+        // To calculate the state value from the attributes. This defaults to the state getStateValue()
+        List<Action> actionList = state.getActions();
+        StateAttributes stateAttributes = state.getStateAttributes();
+        AgentStateValue agentStateValue = new AgentStateValueImpl(actionList, stateAttributes);
+        Integer thisStateValue = agentStateValue.getStateId();
 
         // Initialisations.
         Map<Action,Map<Integer, SASValue>> actionStateValue = new HashMap<Action, Map<Integer, SASValue>>();
         Map<Integer, SASValue> stateValue = new HashMap<Integer, SASValue>();
         Map<Action,Double> actionValues = new HashMap<Action, Double>();
-        
+
         if ( agentEvents.size() != 0 ) {
             actionStateValue = agentEvents.get(thisStateValue);
+            if ( actionStateValue == null ) {
+                // nothing yet added go random
+                int random = (int) (Math.random()*state.getActions().size());
+                Action action = state.getActions().get(random);
+                return action;
+            }
+
             for( Action action : actionStateValue.keySet() ) {
                 Double actionValue = 0.0;
                 int count = 0;
@@ -127,7 +134,7 @@ public class AgentEventsImpl implements AgentEvents {
                 actionValues.put(action, (actionValue/count));
             }
         }
-        
+
         // Initialise with null
         Action bestAction = null;
         Double bestValue = 0.0;
@@ -147,10 +154,10 @@ public class AgentEventsImpl implements AgentEvents {
      */
     @Override
     public List<ActionValue> getActions(State state) {
-    	// Check input
-    	if ( state == null ) throw new IllegalArgumentException("Null state received.");
-    	if ( state.getActions().size() == 0 ) throw new IllegalStateException("No actions available for received state.");
-    	
+        // Check input
+        if ( state == null ) throw new IllegalArgumentException("Null state received.");
+        if ( state.getActions().size() == 0 ) throw new IllegalStateException("No actions available for received state.");
+
         // Initialisations.
         Map<Action,Map<Integer, SASValue>> actionStateValue = new HashMap<Action, Map<Integer, SASValue>>();
         Map<Integer, SASValue> stateValue = new HashMap<Integer, SASValue>();
@@ -163,8 +170,8 @@ public class AgentEventsImpl implements AgentEvents {
             actionStateValue = agentEvents.get(thisStateValue);
             List<Action> stateActions = state.getActions();
             for( Action action : actionStateValue.keySet() ) {
-            	if ( !stateActions.contains(action) ) 
-            		throw new IllegalStateException("Action '" + action + "' is not found on the given state.");
+                if ( !stateActions.contains(action) ) 
+                    throw new IllegalStateException("Action '" + action + "' is not found on the given state.");
                 Double actionValue = 0.0;
                 int count = 0;
                 stateValue = actionStateValue.get(action);
@@ -177,7 +184,7 @@ public class AgentEventsImpl implements AgentEvents {
                 actionValues.put(action, (actionValue/count));
             }
         }
-        
+
         List<ActionValue> actionValueList = new LinkedList<ActionValue>();
         for( Action action : actionValues.keySet() ) {
             ActionValue aValue = new ActionValueImpl(action, actionValues.get(action));
