@@ -59,6 +59,7 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
     public void addAgent(Agent agent, Integer visionRadius) {
         // Validate arguments.
         if ( agent == null ) throw new IllegalArgumentException("Cannot add a null Agent.");
+        if ( visionRadius == null ) throw new IllegalArgumentException("Vision radius cannot be null.");
 
 // For now, 0,0 becomes the initial position for all agents.
 // TODO: Decide what should be the best starting position.
