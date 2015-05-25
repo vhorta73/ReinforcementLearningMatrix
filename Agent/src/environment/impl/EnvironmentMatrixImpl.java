@@ -16,17 +16,22 @@ public class EnvironmentMatrixImpl implements EnvironmentMatrix {
      * The matrix.
      */
     private final Pixel[][] matrix;
+    
+    /**
+     * Flag to tell if the matrix edges touch.
+     */
+    private final boolean roundMatrix;
 
     /**
      * Constructor.
      * 
      * @param matrix
      */
-    public EnvironmentMatrixImpl(Pixel[][] matrix) {
+    public EnvironmentMatrixImpl(Pixel[][] matrix, boolean roundMatrix) {
         // Validate parameters.
         if ( matrix == null ) throw new IllegalArgumentException("Matrix cannot be null.");
-
         this.matrix = matrix;
+        this.roundMatrix = roundMatrix;
     }
 
     /**
@@ -46,25 +51,31 @@ public class EnvironmentMatrixImpl implements EnvironmentMatrix {
      */
     @Override
     public Vision getVision(Integer x, Integer y, Integer radius) {
-        if ( (x - radius) < 0 | (x + radius) > matrix.length ) 
-            throw new IllegalArgumentException("X out of bounds for given radius. ("+x+")");
-        if ( (y - radius) < 0 | (y + radius) > matrix[0].length ) 
-            throw new IllegalArgumentException("Y out of bounds for given radius. ("+y+")");
+    	if ( roundMatrix ) {
+    		// TODO
+    		throw new IllegalStateException("Please implement me: round matrix.");
+    	}
+    	else {
+            if ( (x - radius) < 0 | (x + radius) > matrix.length ) 
+                throw new IllegalArgumentException("X out of bounds for given radius. ("+x+")");
+            if ( (y - radius) < 0 | (y + radius) > matrix[0].length ) 
+                throw new IllegalArgumentException("Y out of bounds for given radius. ("+y+")");
 
-        Integer diameter = radius + radius + 1;
-        Integer[][][] vis = new Integer[diameter][diameter][3];
-        int xxx = 0;
-        for(int xx = x-radius; xx < x+radius+1; xx++) {
-            int yyy = 0;
-            for(int yy = y-radius; yy < y+radius+1; yy++) {
-                int r = matrix[xx][yy].getR();
-                int g = matrix[xx][yy].getG();
-                int b = matrix[xx][yy].getB();
-                vis[xxx][yyy] = new Integer[]{r, g, b};
-                yyy++;
+            Integer diameter = radius + radius + 1;
+            Integer[][][] vis = new Integer[diameter][diameter][3];
+            int xxx = 0;
+            for(int xx = x-radius; xx < x+radius+1; xx++) {
+                int yyy = 0;
+                for(int yy = y-radius; yy < y+radius+1; yy++) {
+                    int r = matrix[xx][yy].getR();
+                    int g = matrix[xx][yy].getG();
+                    int b = matrix[xx][yy].getB();
+                    vis[xxx][yyy] = new Integer[]{r, g, b};
+                    yyy++;
+                }
+                xxx++;    
             }
-            xxx++;    
+            return new VisionImpl(vis);
         }
-        return new VisionImpl(vis);
     }
 }

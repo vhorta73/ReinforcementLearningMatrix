@@ -35,20 +35,27 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
 
     /**
      * Initial coordinate X for new agents.
+     * Default to the middle of the matrix.
      */
-    private final int INITIAL_X = 20;
+    private int INITIAL_X;
 
     /**
      * Initial coordinate Y for new agents.
+     * Default to the middle of the matrix.
      */
-    private final int INITIAL_Y = 20;
+    private int INITIAL_Y;
 
     /**
      * Constructor.
      */
-    public EnvironmentImpl(Pixel[][] matrix) {
+    public EnvironmentImpl(Pixel[][] matrix, Boolean roundMatrix) {
         // Load given matrix.
-        super(matrix);
+        super(matrix, roundMatrix);
+        
+        // TODO: Chose other starting position for when this one is blocking any action.
+        INITIAL_X = (int) (matrix.length / 2);
+        INITIAL_Y = (int) (matrix[0].length / 2);
+
         environmentAgentHanlderList = new LinkedList<EnvironmentAgentHandler>();
     }
 
@@ -61,9 +68,6 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         if ( agent == null ) throw new IllegalArgumentException("Cannot add a null Agent.");
         if ( visionRadius == null ) throw new IllegalArgumentException("Vision radius cannot be null.");
 
-// For now, 0,0 becomes the initial position for all agents.
-// TODO: Decide what should be the best starting position.
-// TODO: create new function to return a random valid position?
         Position position = new PositionImpl(INITIAL_X, INITIAL_Y);
 
         // We don't have an agent id, so we check for the highest agentId and
@@ -203,7 +207,7 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
 
         // Update the agent with the current new state and the reward found at this state.
         agent.set(currentState, reward);
-
+System.out.println(action+"["+currentPosition.getX()+","+currentPosition.getY()+"]->["+newPosition.getX()+","+newPosition.getY()+"]");
         // Calculate the final EnvironmentAgentHanlder object and return it.
         return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId);
     }
@@ -229,6 +233,8 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
             // Add current action as valid.
             actionList.add(action);
         }
+        if ( actionList.size() == 0 ) 
+        	throw new IllegalStateException("Ops.. Environment found a position without actions: ["+position.getX()+","+position.getY()+"].");
         return actionList;
     }
 

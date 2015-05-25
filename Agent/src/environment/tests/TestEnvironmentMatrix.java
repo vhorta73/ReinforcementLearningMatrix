@@ -28,6 +28,11 @@ public class TestEnvironmentMatrix {
 	 * The actual matrix.
 	 */
 	private Pixel[][] matrix;
+	
+	/**
+	 * Round matrix flag.
+	 */
+	private final Boolean ROUND_MATRIX = false;
 
 	/**
 	 * Generate a new set of values for the matrix every time.
@@ -46,7 +51,7 @@ public class TestEnvironmentMatrix {
 				matrix[x][y] = pixel;
 			}
 		}
-		environmentMatrix = new EnvironmentMatrixImpl(matrix);
+		environmentMatrix = new EnvironmentMatrixImpl(matrix, ROUND_MATRIX);
 	}
 
 	/**
