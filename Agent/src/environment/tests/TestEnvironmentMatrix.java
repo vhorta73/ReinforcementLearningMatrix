@@ -90,7 +90,7 @@ public class TestEnvironmentMatrix {
 	 */
 	@Test
 	public void testPixelMatch() {
-		Pixel foundPixel = environmentMatrix.get(3, 4);
+		Pixel foundPixel = environmentMatrix.getPixel(3, 4);
 		assertNotNull(foundPixel);
 		assertEquals(foundPixel.getR(), matrix[3][4].getR());
 		assertEquals(foundPixel.getG(), matrix[3][4].getG());
@@ -102,7 +102,7 @@ public class TestEnvironmentMatrix {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testOutOfBoundsXNeg() {
-		environmentMatrix.get(-1, 0);
+		environmentMatrix.getPixel(-1, 0);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class TestEnvironmentMatrix {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testOutOfBoundsXPos() {
-		environmentMatrix.get(61, 0);
+		environmentMatrix.getPixel(61, 0);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class TestEnvironmentMatrix {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testOutOfBoundsYNeg() {
-		environmentMatrix.get(0, -1);
+		environmentMatrix.getPixel(0, -1);
 	}
 
 	/**
@@ -126,6 +126,6 @@ public class TestEnvironmentMatrix {
 	 */
 	@Test(expected=IllegalArgumentException.class)
 	public void testOutOfBoundsYPos() {
-		environmentMatrix.get(0, 41);
+		environmentMatrix.getPixel(0, 41);
 	}
 }

@@ -1,5 +1,8 @@
 package environment.interfaces;
 
+import java.util.List;
+
+import agent.constants.Action;
 import agent.interfaces.Vision;
 
 /**
@@ -24,7 +27,7 @@ public interface EnvironmentMatrix {
 	 * @param y coordinate
 	 * @return Pixel 
 	 */
-	public Pixel get(Integer x, Integer y);
+	public Pixel getPixel(Integer x, Integer y);
 
 	/**
 	 * The Vision of the matrix seen from coordinates x,y with given radius.
@@ -35,4 +38,21 @@ public interface EnvironmentMatrix {
 	 * @return Vision
 	 */
 	public Vision getVision(Integer x, Integer y, Integer radius);
+
+	/**
+     * Gathering all possible actions set by the environment at given position.
+     * 
+     * @param position
+     * @return Action List
+	 */
+	public List<Action> getPossibleActions(Position position);
+	
+	/**
+	 * Converting initial given Position to a new one via the Action supplied.
+	 * 
+	 * @param action to apply
+	 * @param position to convert
+	 * @return Position converted
+	 */
+	public Position applyAction(Action action, Position position);
 }

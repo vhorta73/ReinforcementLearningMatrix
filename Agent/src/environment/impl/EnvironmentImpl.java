@@ -10,7 +10,6 @@ import agent.interfaces.Agent;
 import agent.interfaces.State;
 import agent.interfaces.StateAttributes;
 import agent.interfaces.Vision;
-import environment.interfaces.ActionProcess;
 import environment.interfaces.Environment;
 import environment.interfaces.EnvironmentAgentHandler;
 import environment.interfaces.Pixel;
@@ -27,6 +26,11 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
      * The list of active agents on the environment.
      */
     private List<EnvironmentAgentHandler> environmentAgentHanlderList;
+    
+    /**
+     * Agent counter.
+     */
+    private Integer agentId = 1;
 
     /**
      * The exiting flag.
@@ -70,21 +74,16 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
 
         Position position = new PositionImpl(INITIAL_X, INITIAL_Y);
 
-        // We don't have an agent id, so we check for the highest agentId and
-        // assign to this one unless... we already have this agent in list.
-        Integer highestId = 0;
-        Integer previousId = 0;
+        // Cannot add the same agent twice, thus check if we have it already before adding it.
         for (EnvironmentAgentHandler environmentAgentHandler : environmentAgentHanlderList ) {
             Agent alreadyAdded = environmentAgentHandler.getAgent();
             if ( alreadyAdded.equals(agent) ) {
                 throw new IllegalStateException("Cannot add same agent twice.");
             }
-            previousId = environmentAgentHandler.getAgentId();
-            if ( highestId < previousId ) highestId = environmentAgentHandler.getAgentId();
         }
 
         // Get the reward if any at current position.
-        Double reward = get(position.getX(),position.getY()).getReward();
+        Double reward = getPixel(position.getX(),position.getY()).getReward();
         // Gather all possible actions.
         List<Action> actionList = getPossibleActions(position);
         // Get the vision.
@@ -98,9 +97,12 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         agent.set(currentState, reward);
 
         // Create the new EnvironmentAgentHandler and add it to the list.
-        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(agent, visionRadius, position, highestId + 1);
+        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(agent, visionRadius, position, agentId);
         // ..and off you go..
         environmentAgentHanlderList.add(newAgent);
+
+        // Increment for the next agent.
+        agentId++;
     }
 
     /**
@@ -114,9 +116,9 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         // Loop through all agents in list and remove the one with the same agent address.
         for( int i = 0; i < environmentAgentHanlderList.size(); i++ ) {
             // Take the change to ensure the sanity of the list with no mercy for mistakes elsewhere.
-            EnvironmentAgentHandler foundHanlder = environmentAgentHanlderList.get(i);
-            if ( foundHanlder == null ) throw new IllegalStateException("Null handler found in list.");
-            Agent foundAgent = foundHanlder.getAgent();
+            EnvironmentAgentHandler foundHandler = environmentAgentHanlderList.get(i);
+            if ( foundHandler == null ) throw new IllegalStateException("Null handler found in list.");
+            Agent foundAgent = foundHandler.getAgent();
             if ( foundAgent == null ) throw new IllegalStateException("Null agent found in list.");
 
             // Check now if this is the same agent to be removed.
@@ -138,11 +140,17 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
     public void run() {
         // Run forever until requested to exit
         while(!exit) {
+try {
+	Thread.sleep(20);
+} catch (InterruptedException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
 
             // Loop through each agent to collect ready actions and reply with new state.
             for( int i = 0 ; i < environmentAgentHanlderList.size(); i++ ) {
 
-                // Get the respective environment Agent Handler
+            	// Get the respective environment Agent Handler
                 EnvironmentAgentHandler oldEnvironmentAgentHandler = environmentAgentHanlderList.get(i);
                 if ( oldEnvironmentAgentHandler == null ) throw new IllegalStateException("Handler cannot be null.");
 
@@ -189,13 +197,12 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
     // ======================== Action being executed here ======================= //
 
         // Convert the requested action from current position to the new position
-        ActionMatrixProcess actionConverter = new ActionMatrixProcess();
-        Position newPosition = actionConverter.execute(action, currentPosition);
-
+        Position newPosition = applyAction(action, currentPosition);
+        
     // =========================================================================== //
 
         // Get all possible actions at this new position.
-        List<Action> actionList = getPossibleActions(newPosition);
+        List<Action> actionList = super.getPossibleActions(newPosition);
         // Get the vision seen from this new position.
         Vision vision = super.getVision(newPosition.getX(), newPosition.getY(), visionRadius);
         // Add the vision to the new State Attributes to be passed on the State
@@ -203,39 +210,14 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         // Create the new state object to be given to the Agent.
         State currentState = new StateImpl(actionList, stateAttributes);
         // The reward found at this state by the environment.
-        Double reward = get(newPosition.getX(),newPosition.getY()).getReward();
+        Double reward = getPixel(newPosition.getX(),newPosition.getY()).getReward();
 
         // Update the agent with the current new state and the reward found at this state.
         agent.set(currentState, reward);
-System.out.println(action+"["+currentPosition.getX()+","+currentPosition.getY()+"]->["+newPosition.getX()+","+newPosition.getY()+"]");
+// TODO: Clean up this when done debugging.
+System.out.println(environmentAgentHandler.getAgentId()+ " = " +action+"["+currentPosition.getX()+","+currentPosition.getY()+"]->["+newPosition.getX()+","+newPosition.getY()+"]");
         // Calculate the final EnvironmentAgentHanlder object and return it.
         return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId);
-    }
-
-    /**
-     * Gathering all possible actions set by the environment at given position.
-     * 
-     * @param position
-     * @return Action List
-     */
-    private List<Action> getPossibleActions(Position position) {
-        List<Action> actionList = new LinkedList<Action>();
-        ActionProcess<Position> actionProcess = new ActionMatrixProcess();
-
-        // Go over all possible actions in the book and check which ones
-        // are possible to be done from this given position
-        for ( Action action : Action.values() ) {
-            Position newPosition = actionProcess.execute(action, position);
-            Pixel pixel = get(newPosition.getX(),newPosition.getY());
-            // Don't add this action if resulting position is blocked
-            if ( pixel.isBlocked() ) continue;
-
-            // Add current action as valid.
-            actionList.add(action);
-        }
-        if ( actionList.size() == 0 ) 
-        	throw new IllegalStateException("Ops.. Environment found a position without actions: ["+position.getX()+","+position.getY()+"].");
-        return actionList;
     }
 
     /**
