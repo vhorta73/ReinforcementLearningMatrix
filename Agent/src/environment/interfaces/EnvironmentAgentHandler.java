@@ -37,4 +37,17 @@ public interface EnvironmentAgentHandler {
 	 */
 	public Agent getAgent();
 
+	/**
+	 * Check if Agent's vision is to be displayed.
+	 * 
+	 * @return true if to be shown
+	 */
+	public Boolean isShowVision();
+
+	/**
+	 * Allow to set the vision to true of false.
+	 * 
+	 * @param value true to display
+	 */
+	public void setVision(Boolean value);
 }

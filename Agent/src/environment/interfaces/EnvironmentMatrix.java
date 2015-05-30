@@ -19,7 +19,7 @@ import agent.interfaces.Vision;
  * @author Vasco
  *
  */
-public interface EnvironmentMatrix {
+public interface EnvironmentMatrix extends GraphicalDisplay {
 	/**
 	 * Get a Pixel from the Matrix corresponding to the given x,y coordinates.
 	 * 

@@ -17,22 +17,22 @@ import environment.interfaces.Position;
  * @author Vasco
  *
  */
-public class EnvironmentMatrixImpl implements EnvironmentMatrix {    
+public class EnvironmentMatrixImpl extends GraphicalDisplayImpl implements EnvironmentMatrix {    
     /**
      * The matrix.
      */
     private final Pixel[][] matrix;
-    
+
     /**
      * Flag to tell if the matrix edges touch.
      */
     private final boolean roundMatrix;
-    
+
     /**
      * The default out of range pixel.
      */
     private final Pixel OUT_OF_RANGE_PIXEL = new PixelImpl(0, 0, 0, true, 0.0);
-    
+
     /**
      * The Action Matrix Process to convert any Position to the expected
      * after given action is applied.
@@ -45,8 +45,12 @@ public class EnvironmentMatrixImpl implements EnvironmentMatrix {
      * @param matrix
      */
     public EnvironmentMatrixImpl(Pixel[][] matrix, boolean roundMatrix) {
+        // Get a graphical representation of this environment
+        super(matrix);
+
         // Validate parameters.
         if ( matrix == null ) throw new IllegalArgumentException("Matrix cannot be null.");
+
         this.matrix = matrix;
         this.roundMatrix = roundMatrix;
     }

@@ -22,11 +22,11 @@ import environment.interfaces.Position;
  *
  */
 public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environment {
-    /**
+	/**
      * The list of active agents on the environment.
      */
     private List<EnvironmentAgentHandler> environmentAgentHanlderList;
-    
+
     /**
      * Agent counter.
      */
@@ -55,7 +55,7 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
     public EnvironmentImpl(Pixel[][] matrix, Boolean roundMatrix) {
         // Load given matrix.
         super(matrix, roundMatrix);
-        
+
         // TODO: Chose other starting position for when this one is blocking any action.
         INITIAL_X = (int) (matrix.length / 2);
         INITIAL_Y = (int) (matrix[0].length / 2);
@@ -92,12 +92,14 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         StateAttributes stateAttributes = new StateAttributesImpl(0, vision);
         // Setup the current state for the Agent.
         State currentState = new StateImpl(actionList, stateAttributes);
+        // The initial show vision flag 
+        Boolean showVision = false;
 
         // Set the Agent with its first initial state.
         agent.set(currentState, reward);
 
         // Create the new EnvironmentAgentHandler and add it to the list.
-        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(agent, visionRadius, position, agentId);
+        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(agent, visionRadius, position, agentId, showVision);
         // ..and off you go..
         environmentAgentHanlderList.add(newAgent);
 
@@ -185,11 +187,13 @@ try {
         Integer agentId = environmentAgentHandler.getAgentId();
         Position currentPosition = environmentAgentHandler.getAgentPosition();
         Integer visionRadius = environmentAgentHandler.getVisionRadius();
+        Boolean showVision = environmentAgentHandler.isShowVision();
 
         if ( agent == null ) throw new IllegalStateException("Agent cannot be null.");
         if ( agentId == null ) throw new IllegalStateException("Agent ID cannot be null.");
         if ( currentPosition == null ) throw new IllegalStateException("Agent's position cannot be null.");        
         if ( visionRadius == null ) throw new IllegalStateException("Vision radius cannot be null.");
+        if ( showVision == null ) throw new IllegalStateException("Show vision cannot be null.");
 
         Action action = agent.getAction();
         if ( action == null ) throw new IllegalStateException("Action cannot be null.");
@@ -217,7 +221,7 @@ try {
 // TODO: Clean up this when done debugging.
 System.out.println(environmentAgentHandler.getAgentId()+ " = " +action+"["+currentPosition.getX()+","+currentPosition.getY()+"]->["+newPosition.getX()+","+newPosition.getY()+"]");
         // Calculate the final EnvironmentAgentHanlder object and return it.
-        return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId);
+        return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId, environmentAgentHandler.isShowVision());
     }
 
     /**
@@ -227,4 +231,73 @@ System.out.println(environmentAgentHandler.getAgentId()+ " = " +action+"["+curre
     public void exit() {
         this.exit = true;
     }
+
+    /**
+     * Shows the full environment.
+     */
+	@Override
+	public void showEnvironment() {
+		super.show();
+	}
+
+	/**
+	 * Hides the full environment.
+	 */
+	@Override
+	public void hideEnvironment() {
+		super.hide();
+	}
+
+	/**
+	 * Shows the Agent's vision.
+	 */
+	@Override
+	public void showAgent(Agent agent) {
+		// Validate arguments.
+		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+
+		// Set the display to show the Agent's vision.
+		setVision(agent, true);
+	}
+
+	/**
+	 * Hides the Agent's vision.
+	 */
+	@Override
+	public void hideAgent(Agent agent) {
+		// Validate arguments.
+		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+
+		// Set the display to not show the Agent's vision.
+		setVision(agent, false);
+	}
+
+	/**
+	 * Set the vision for the given agent to ON or OFF
+	 * 
+	 * @param agent to update
+	 * @param vision on or off
+	 */
+	private void setVision(Agent agent, Boolean vision) {
+		// Validate arguments.
+		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+		if ( vision == null ) throw new IllegalArgumentException("Vision cannot be null.");
+
+		// Find the respective Agent.
+		for(EnvironmentAgentHandler environmentAgentHandler : environmentAgentHanlderList ) {
+
+			// Retrieve the agent object address to compare.
+			Agent agentFound = environmentAgentHandler.getAgent();
+
+			// Same address.
+			if ( agent.equals(agentFound) ) {
+
+				// Set the vision to be displayed
+				environmentAgentHandler.setVision(vision);
+
+				// All done, nothing more to be done.
+				return;
+			}
+		}
+	}
 }
