@@ -113,7 +113,14 @@ public class TestAgent {
      * Check state is ready after state given and action received.
      */
     @Test
-    public void testIsStateReady() {
+    public synchronized void testIsStateReady() {
+        // All other tests must run first.
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // Tell the agent which new state its in and which actions available
         List<Action> actionList = new LinkedList<Action>();
         actionList.add(Action.UP);
