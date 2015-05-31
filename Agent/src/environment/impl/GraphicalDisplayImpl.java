@@ -64,14 +64,37 @@ public class GraphicalDisplayImpl implements GraphicalDisplay {
      */
     @Override
     public void run() {
+        // The amount of time in milliseconds a frame should takes.
+        Long millisPerFrame = ( 1000L / FRAMES_PER_SECOND );
+
+        // The amount of sleep needed to compensate.
+        Long sleepingTime = millisPerFrame;
+
         while(!shutdown) {
+            // The loop starting time.
+            Long start = System.currentTimeMillis();
+
+            // The compensating sleep.
             try {
-                Thread.sleep(FRAMES_PER_SECOND);
+                Thread.sleep(sleepingTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // TODO clean up this code.
+
+            // TODO clean up this code and build the display here.
             System.out.print(".");
+
+            // The end of the loop.
+            Long end = System.currentTimeMillis();
+
+            // The time taken on this loop.
+            Long diffMillis = end - start;
+
+            // Calculate the next sleeping time to compensate any elapsed or delay taken.
+            sleepingTime = 
+                      ( diffMillis > millisPerFrame ) 
+                    ? ( diffMillis - millisPerFrame ) 
+                    : ( millisPerFrame - diffMillis );
         }
     }
 
