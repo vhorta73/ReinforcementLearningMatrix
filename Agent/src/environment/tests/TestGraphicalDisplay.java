@@ -18,10 +18,10 @@ public class TestGraphicalDisplay {
 	 * The EnvironmentGraphics object handler.
 	 */
     private GraphicalDisplay environmentGraphics;
-    
+
     @Before
     public void before() {
-    	environmentGraphics = new GraphicalDisplayImpl(new Pixel[10][]);
+    	environmentGraphics = new GraphicalDisplayImpl(new Pixel[10][10]);
     }
     
     @Test

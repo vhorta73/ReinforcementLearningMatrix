@@ -10,26 +10,76 @@ import environment.interfaces.Pixel;
  *
  */
 public class GraphicalDisplayImpl implements GraphicalDisplay {
-	private boolean show = false;
-	private Pixel[][] matrix;
+    // TODO
+    private boolean show = false;
+    // TODO
+    private Pixel[][] matrix;
 
-	public GraphicalDisplayImpl(Pixel[][] environmentMatrix) {
-		if ( environmentMatrix == null ) throw new IllegalArgumentException("Matrix cannot be null.");
-		this.matrix = environmentMatrix;
-	}
+    /**
+     * The shutdown switch.
+     */
+    private Boolean shutdown = false;
 
-	@Override
-	public void show() {
-		this.show = true;
-	}
+    // TODO
+    private final Integer FRAMES_PER_SECOND = 60;
 
-	@Override
-	public void hide() {
-		this.show = false;
-	}
+    /**
+     * Constructor.
+     * 
+     * @param pixelMatrix 2D
+     */
+    public GraphicalDisplayImpl(Pixel[][] pixelMatrix) {
+        // Validate arguments.
+        if ( pixelMatrix == null ) throw new IllegalArgumentException("Matrix cannot be null.");
 
-	@Override
-	public void render() {
-		// TODO Auto-generated method stub
-	}
+        this.matrix = pixelMatrix;
+    }
+
+    /**
+     * Display the matrix.
+     */
+    @Override
+    public void show() {
+        this.show = true;
+    }
+
+    /**
+     * Hide the matrix.
+     */
+    @Override
+    public void hide() {
+        this.show = false;
+    }
+
+    /**
+     * Render new image.
+     */
+    @Override
+    public void render() {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * The runnable.
+     */
+    @Override
+    public void run() {
+        while(!shutdown) {
+            try {
+                Thread.sleep(FRAMES_PER_SECOND);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // TODO clean up this code.
+            System.out.print(".");
+        }
+    }
+
+    /**
+     * Set this thread to exit.
+     */
+    @Override
+    public void shutdown() {
+        this.shutdown = true;
+    }
 }

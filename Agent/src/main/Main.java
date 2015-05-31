@@ -35,11 +35,15 @@ public class Main {
         try {
             env.addAgent(aa, 1);
             Thread.sleep(500);
-            System.out.println("Time is up");
+            env.showAgent(aa);
+            Thread.sleep(500);
+            env.hideAgent(aa);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         
-        env.exit();
+        env.shutdown();
+        System.out.println("Time is up");
     }
 }

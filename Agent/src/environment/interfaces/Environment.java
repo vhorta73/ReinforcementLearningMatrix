@@ -26,7 +26,7 @@ public interface Environment extends Runnable {
     /**
      * Closing all actions and exiting.
      */
-    public void exit();
+    public void shutdown();
 
     /**
      * Displays the environment matrix.

@@ -12,6 +12,7 @@ import agent.interfaces.StateAttributes;
 import agent.interfaces.Vision;
 import environment.interfaces.Environment;
 import environment.interfaces.EnvironmentAgentHandler;
+import environment.interfaces.GraphicalDisplay;
 import environment.interfaces.Pixel;
 import environment.interfaces.Position;
 
@@ -22,7 +23,7 @@ import environment.interfaces.Position;
  *
  */
 public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environment {
-	/**
+    /**
      * The list of active agents on the environment.
      */
     private List<EnvironmentAgentHandler> environmentAgentHanlderList;
@@ -94,12 +95,19 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         State currentState = new StateImpl(actionList, stateAttributes);
         // The initial show vision flag 
         Boolean showVision = false;
+        // The initial GraphicalDisplay Handler with Agent's set vision radius
+        GraphicalDisplay graphicsDisplay = new GraphicalDisplayImpl(new Pixel[visionRadius][visionRadius]);
+        // The initial GraphicalDisplay Thread handler
+        Thread graphicsDisplayThreadHandler = new Thread(graphicsDisplay);
+        graphicsDisplayThreadHandler.start();
 
         // Set the Agent with its first initial state.
         agent.set(currentState, reward);
 
         // Create the new EnvironmentAgentHandler and add it to the list.
-        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(agent, visionRadius, position, agentId, showVision);
+        EnvironmentAgentHandler newAgent = new EnvironmentAgentHandlerImpl(
+                agent, visionRadius, position, agentId, showVision,
+                graphicsDisplay, graphicsDisplayThreadHandler);
         // ..and off you go..
         environmentAgentHanlderList.add(newAgent);
 
@@ -143,16 +151,16 @@ public class EnvironmentImpl extends EnvironmentMatrixImpl implements Environmen
         // Run forever until requested to exit
         while(!exit) {
 try {
-	Thread.sleep(20);
+    Thread.sleep(20);
 } catch (InterruptedException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
+    // TODO Auto-generated catch block
+    e.printStackTrace();
 }
 
             // Loop through each agent to collect ready actions and reply with new state.
             for( int i = 0 ; i < environmentAgentHanlderList.size(); i++ ) {
 
-            	// Get the respective environment Agent Handler
+                // Get the respective environment Agent Handler
                 EnvironmentAgentHandler oldEnvironmentAgentHandler = environmentAgentHanlderList.get(i);
                 if ( oldEnvironmentAgentHandler == null ) throw new IllegalStateException("Handler cannot be null.");
 
@@ -180,7 +188,8 @@ try {
      */
     private EnvironmentAgentHandler process(EnvironmentAgentHandler environmentAgentHandler) {
         // Validate parameters.
-        if ( environmentAgentHandler == null ) throw new IllegalArgumentException("EnvironmentAgentHanlder cannot be null.");
+        if ( environmentAgentHandler == null ) 
+            throw new IllegalArgumentException("EnvironmentAgentHanlder cannot be null.");
 
         // Gather all environment agent handler information.
         Agent agent = environmentAgentHandler.getAgent();
@@ -215,89 +224,136 @@ try {
         State currentState = new StateImpl(actionList, stateAttributes);
         // The reward found at this state by the environment.
         Double reward = getPixel(newPosition.getX(),newPosition.getY()).getReward();
+        // Time to update the display if required.
+        Thread graphicalThread = environmentAgentHandler.getDisplayThreadHandler();
+        GraphicalDisplay graphicalDisplay = environmentAgentHandler.getDisplayHandler();
+        if ( showVision && graphicalThread.isAlive() ) {
+            graphicalDisplay.run();
+        }
+        else {
+            graphicalDisplay.hide();
+        }
 
         // Update the agent with the current new state and the reward found at this state.
         agent.set(currentState, reward);
 // TODO: Clean up this when done debugging.
 System.out.println(environmentAgentHandler.getAgentId()+ " = " +action+"["+currentPosition.getX()+","+currentPosition.getY()+"]->["+newPosition.getX()+","+newPosition.getY()+"]");
         // Calculate the final EnvironmentAgentHanlder object and return it.
-        return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId, environmentAgentHandler.isShowVision());
+        return new EnvironmentAgentHandlerImpl(agent, visionRadius, newPosition, agentId, 
+                environmentAgentHandler.isShowVision(), 
+                environmentAgentHandler.getDisplayHandler(),
+                environmentAgentHandler.getDisplayThreadHandler());
+    }
+
+    /**
+     * Exit all remaining active threads.
+     */
+    private void exitAll() {
+        // Go over each Environment Agent handler and quit every live thread.
+        for(EnvironmentAgentHandler environmentAgentHandler : environmentAgentHanlderList ) {
+
+            // Thread to close.
+            Thread closeThread = environmentAgentHandler.getDisplayThreadHandler();
+
+            // Check if it was initialised first.
+            if ( closeThread != null ) {
+
+                // Now check if it is alive.
+                if ( closeThread.isAlive() ) {
+
+                    // Let's get the graphical display, and issue a shutdown
+                    GraphicalDisplay graphicalDisplay = environmentAgentHandler.getDisplayHandler();
+                    if ( graphicalDisplay != null ) graphicalDisplay.shutdown();
+                }
+            }
+        }
     }
 
     /**
      * The turn-off switch.
      */
     @Override
-    public void exit() {
+    public void shutdown() {
+        // Exit all threads here before quitting this one.
+        exitAll();
+
+        // Ready to switch the mains off.
         this.exit = true;
+
+        // Give 1 second for everything to close and avoid surprises..
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * Shows the full environment.
      */
-	@Override
-	public void showEnvironment() {
-		super.show();
-	}
+    @Override
+    public void showEnvironment() {
+        super.show();
+    }
 
-	/**
-	 * Hides the full environment.
-	 */
-	@Override
-	public void hideEnvironment() {
-		super.hide();
-	}
+    /**
+     * Hides the full environment.
+     */
+    @Override
+    public void hideEnvironment() {
+        super.hide();
+    }
 
-	/**
-	 * Shows the Agent's vision.
-	 */
-	@Override
-	public void showAgent(Agent agent) {
-		// Validate arguments.
-		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+    /**
+     * Shows the Agent's vision.
+     */
+    @Override
+    public void showAgent(Agent agent) {
+        // Validate arguments.
+        if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
 
-		// Set the display to show the Agent's vision.
-		setVision(agent, true);
-	}
+        // Set the display to show the Agent's vision.
+        setVision(agent, true);
+    }
 
-	/**
-	 * Hides the Agent's vision.
-	 */
-	@Override
-	public void hideAgent(Agent agent) {
-		// Validate arguments.
-		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+    /**
+     * Hides the Agent's vision.
+     */
+    @Override
+    public void hideAgent(Agent agent) {
+        // Validate arguments.
+        if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
 
-		// Set the display to not show the Agent's vision.
-		setVision(agent, false);
-	}
+        // Set the display to not show the Agent's vision.
+        setVision(agent, false);
+    }
 
-	/**
-	 * Set the vision for the given agent to ON or OFF
-	 * 
-	 * @param agent to update
-	 * @param vision on or off
-	 */
-	private void setVision(Agent agent, Boolean vision) {
-		// Validate arguments.
-		if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
-		if ( vision == null ) throw new IllegalArgumentException("Vision cannot be null.");
+    /**
+     * Set the vision for the given agent to ON or OFF
+     * 
+     * @param agent to update
+     * @param vision on or off
+     */
+    private void setVision(Agent agent, Boolean vision) {
+        // Validate arguments.
+        if ( agent == null ) throw new IllegalArgumentException("Agent cannot be null.");
+        if ( vision == null ) throw new IllegalArgumentException("Vision cannot be null.");
 
-		// Find the respective Agent.
-		for(EnvironmentAgentHandler environmentAgentHandler : environmentAgentHanlderList ) {
+        // Find the respective Agent.
+        for(EnvironmentAgentHandler environmentAgentHandler : environmentAgentHanlderList ) {
 
-			// Retrieve the agent object address to compare.
-			Agent agentFound = environmentAgentHandler.getAgent();
+            // Retrieve the agent object address to compare.
+            Agent agentFound = environmentAgentHandler.getAgent();
 
-			// Same address.
-			if ( agent.equals(agentFound) ) {
+            // Same address.
+            if ( agent.equals(agentFound) ) {
 
-				// Set the vision to be displayed
-				environmentAgentHandler.setVision(vision);
+                // Set the vision to be displayed
+                environmentAgentHandler.setVision(vision);
 
-				// All done, nothing more to be done.
-				return;
-			}
-		}
-	}
+                // All done, nothing more to be done.
+                return;
+            }
+        }
+    }
 }

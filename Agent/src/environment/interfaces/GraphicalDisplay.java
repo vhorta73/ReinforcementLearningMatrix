@@ -5,7 +5,7 @@ package environment.interfaces;
  * @author Vasco
  *
  */
-public interface GraphicalDisplay {
+public interface GraphicalDisplay extends Runnable {
 	/**
 	 * Displays the graphics for the currently rendered graphic.
 	 */
@@ -15,6 +15,11 @@ public interface GraphicalDisplay {
 	 * Hides the graphics for the currently rendered graphic.
 	 */
 	public void hide();
+
+	/**
+	 * When not needed anymore, this will close the running loop.
+	 */
+	public void shutdown();
 
 	/**
 	 * Renders the given matrix into a graphical display.
